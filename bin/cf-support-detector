@@ -1,0 +1,64 @@
+#!/usr/bin/env node
+
+var cfSupportDetector = require('../lib/chromeframe-url-check'),
+	http = require('http'),
+	optimist = require('optimist'),
+  util = require('util');
+
+argv = optimist
+    .usage('Parse websites for Chrome Frame support.\nUsage: $0 [url1 url2 ...]')
+    .alias('s', 'silent')
+    .default('s', false)
+    .describe('s', 'Sets the log output to the minimum')
+    .alias('c', 'config')
+    .describe('c', 'Location of the configuration file')
+    .check(function(argv) {return argv._.length > 0;})
+    .argv;
+
+//
+// Parsing config
+//
+var config = {};
+if (argv.config) {
+  try {
+    var data = fs.readFileSync(argv.config);
+    config = JSON.parse(data.toString());
+  } catch (ex) {
+    util.puts('Error starting chromeframe-url-check: ' + ex);
+    process.exit(1);
+  }
+}
+
+//
+// Create the spider instance
+//
+var spider = cfSupportDetector.createSpider(config);
+
+// and start analyzing
+spider.process(argv._, function(results) {
+
+  results.forEach(function(result) {
+
+    if(argv.silent) {
+      util.puts([ result.url, 
+                  result.cf?"Yes":"No",
+                ].join(' - '));
+    } else {
+      util.puts([ result.url, 
+            result.cf?"Yes":"No",
+            result.httpsupport?"HTTP Support":"",
+            result.htmlsupport?"HTML meta Support":"",
+            result.warn?result.warn:""
+          ].join(' - '));
+    }
+
+  });
+
+});
+
+//
+// Notify that the spider is started
+//
+if (!argv.silent) {
+  util.puts('Started spider - analyzing ' + argv._.length + ' websites');
+}

@@ -1,0 +1,32 @@
+{
+  "name": "chromeframe-url-check",
+  "version": "0.0.1",
+  "description": "detects Chrome Frame support in a web site (through HTTP or HTML headers)",
+  "author": "Brian Clozel <brian.clozel@gmail.com>",
+  "repository": {
+    "type": "git",
+    "url": "http://github.com/bclozel/chromeframe-url-check.git"
+  },
+  "keywords": [
+    "google",
+    "chrome",
+    "chrome-frame",
+    "browser"
+  ],
+  "dependencies": {
+    "pkginfo": "0.2.3",
+    "optimist": "0.3.4",
+    "async": "0.1.22",
+    "request": "2.11.1",
+    "cheerio": "0.9.2"
+  },
+  "devDependencies": {
+  },
+  "main": "./lib/chromeframe-url-check",
+  "bin": {
+    "chromeframe-url-check": "./bin/chromeframe-url-check"
+  },
+  "engines": {
+    "node": ">= 0.8.0"
+  }
+}

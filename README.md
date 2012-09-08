@@ -7,7 +7,7 @@ In other words, "has this website done anything to trigger Google Chrome Frame?"
 
 Currently, this script is looking for:
 
-* HTML meta tags that look like `<meta http-equiv="X-UA-Compatible" content="chrome=1"/>` or `<meta http-equiv="X-UA-Compatible" content="IE=Edge,chrome=1"/>
+* HTML meta tags that look like `<meta http-equiv="X-UA-Compatible" content="chrome=1"/>` or `<meta http-equiv="X-UA-Compatible" content="IE=Edge,chrome=1"/>`
 * Those HTML meta tags are within the first 1024 chars (otherwise it prints a warning message)
 * HTTP response headers like `X-UA-Compatible: chrome=1`
 

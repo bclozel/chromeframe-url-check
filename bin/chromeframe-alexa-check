@@ -11,10 +11,10 @@ argv = optimist
     .usage('Parse websites listed in Alexa for Chrome Frame support.\nUsage: $0')
     .demand('a')
     .alias('a', 'alexa')
-    .default('a', "")
     .alias('c', 'config')
     .describe('c', 'Location of the configuration file')
     .describe('a', "Alexa's URL containing websites to test, like http://www.alexa.com/topsites")
+    .default('a')
     .argv;
 
 //
@@ -44,21 +44,30 @@ var req = {
   url: argv.alexa
 }
 
+var sites = [];
+
 // send a request
 request(req, function(error, response, body) {
       
   // load body with jquery-like API
   var $ = cheerio.load(body);
 
-  var sites = [];
 
   $('.topsites-label').each(function() {
 
-    sites.push('http://www.'+$(this.text());
+    sites.push('http://'+$(this).text());
   });
 
+
+  //
+  // Notify that the spider is started
+  //
+  if (!argv.silent) {
+    util.puts('Started spider - analyzing ' + sites.length + ' websites');
+  }
+
   // and start analyzing
-  spider.process(argv._, function(results) {
+  spider.process(sites, function(results) {
 
     results.forEach(function(result) {
 
@@ -70,7 +79,7 @@ request(req, function(error, response, body) {
         util.puts([ result.url, 
               result.cf?"Yes":"No",
               result.httpsupport?"HTTP Support":"",
-              result.htmlsupport?"HTML meta Support":"",
+              result.htmlsupport?"HTML meta Support: "+result.xuacompatible:result.xuacompatible,
               result.cfinstall?"CFInstall loaded":"",
               result.warn?result.warn:""
             ].join(' - '));
@@ -82,9 +91,3 @@ request(req, function(error, response, body) {
 
 });
 
-//
-// Notify that the spider is started
-//
-if (!argv.silent) {
-  util.puts('Started spider - analyzing ' + sites.length + ' websites');
-}

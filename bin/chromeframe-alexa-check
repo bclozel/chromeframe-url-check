@@ -1,0 +1,90 @@
+#!/usr/bin/env node
+
+var cfSupportDetector = require('../lib/chromeframe-url-check'),
+	http = require('http'),
+	optimist = require('optimist'),
+  util = require('util'),
+  cheerio = require('cheerio'),
+  request = require('request');
+
+argv = optimist
+    .usage('Parse websites listed in Alexa for Chrome Frame support.\nUsage: $0')
+    .demand('a')
+    .alias('a', 'alexa')
+    .default('a', "")
+    .alias('c', 'config')
+    .describe('c', 'Location of the configuration file')
+    .describe('a', "Alexa's URL containing websites to test, like http://www.alexa.com/topsites")
+    .argv;
+
+//
+// Parsing config
+//
+var config = {};
+if (argv.config) {
+  try {
+    var data = fs.readFileSync(argv.config);
+    config = JSON.parse(data.toString());
+  } catch (ex) {
+    util.puts('Error starting chromeframe-url-check: ' + ex);
+    process.exit(1);
+  }
+}
+
+//
+// Create the spider instance
+//
+var spider = cfSupportDetector.createSpider(config);
+
+//
+// Parse Alexa's web page for websites
+//
+
+var req = {
+  url: argv.alexa
+}
+
+// send a request
+request(req, function(error, response, body) {
+      
+  // load body with jquery-like API
+  var $ = cheerio.load(body);
+
+  var sites = [];
+
+  $('.topsites-label').each(function() {
+
+    sites.push('http://www.'+$(this.text());
+  });
+
+  // and start analyzing
+  spider.process(argv._, function(results) {
+
+    results.forEach(function(result) {
+
+      if(argv.silent) {
+        util.puts([ result.url, 
+                    result.cf?"Yes":"No",
+                  ].join(' - '));
+      } else {
+        util.puts([ result.url, 
+              result.cf?"Yes":"No",
+              result.httpsupport?"HTTP Support":"",
+              result.htmlsupport?"HTML meta Support":"",
+              result.cfinstall?"CFInstall loaded":"",
+              result.warn?result.warn:""
+            ].join(' - '));
+      }
+
+    });
+
+  });
+
+});
+
+//
+// Notify that the spider is started
+//
+if (!argv.silent) {
+  util.puts('Started spider - analyzing ' + sites.length + ' websites');
+}

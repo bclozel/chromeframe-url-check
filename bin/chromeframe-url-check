@@ -46,8 +46,8 @@ spider.process(argv._, function(results) {
     } else {
       util.puts([ result.url, 
             result.cf?"Yes":"No",
-            result.httpsupport?"HTTP Support":"",
-            result.htmlsupport?"HTML meta Support: "+result.xuacompatible:restult.xuacompatible,
+            result.httpsupport?"HTTP Support: "+result.hdrxuacompatible:result.hdrxuacompatible,
+            result.htmlsupport?"HTML meta Support: "+result.metaxuacompatible:restult.metaxuacompatible,
             result.cfinstall?"CFInstall loaded":"",
             result.warn?result.warn:""
           ].join(' - '));
